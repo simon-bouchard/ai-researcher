@@ -20,7 +20,6 @@ renamed for direct compatibility, avoiding a symlink (which `llmwiki` excludes a
 ## Status
 
 - [x] Hermes installed and configured locally
-- [x] arXiv research-track validated (70+ papers in `sources/arxiv-*.md`)
 - [x] WikiLLM implementation chosen: `llm-wiki-compiler`
 - [x] GitHub framework discovery track designed and implemented (`scripts/`)
 - [x] GitHub popular track initial run done (~84 files in `sources/github-*.md`)
@@ -44,31 +43,10 @@ renamed for direct compatibility, avoiding a symlink (which `llmwiki` excludes a
 
 ## `/sources` output format
 
-One markdown file per item, in a flat `sources/` directory (required by `llm-wiki-compiler` —
+One markdown file per repo, in a flat `sources/` directory (required by `llm-wiki-compiler` —
 it does not recurse into subdirectories and rejects symlinks, even in-tree ones). Filenames
-are prefixed by source type and the stable source ID, e.g. `sources/arxiv-<arxiv_id>.md`, so
-re-scraping the same item overwrites the file — free dedup, no extra logic needed, while
-keeping provenance visible in the filename (also recorded in the `source` frontmatter field).
-Dedup *across sources* is WikiLLM's job at ingestion.
-
-### arXiv frontmatter schema
-
-```yaml
----
-title: "..."
-arxiv_id: "2506.12345v1"
-authors: ["...", "..."]
-submitted: "YYYY-MM-DD"
-updated: "YYYY-MM-DD"
-categories: ["cs.AI", "cs.CL"]
-primary_category: "cs.AI"
-abs_url: "https://arxiv.org/abs/<id>"
-pdf_url: "https://arxiv.org/pdf/<id>"
-source: arxiv
-scraped_at: "<ISO 8601 UTC>"
----
-<abstract verbatim>
-```
+use the pattern `github-<owner>_<repo>.md`, so re-scraping the same repo overwrites the file —
+free dedup, no extra logic needed. Dedup across sources is WikiLLM's job at ingestion.
 
 ### GitHub frontmatter schema
 
@@ -88,23 +66,6 @@ scraped_at: "<ISO 8601 UTC>"
 ---
 <README verbatim>
 ```
-
-## arXiv research track
-
-- Prompt: `prompts/arxiv_research.md` (self-contained — cron jobs run in fresh sessions, so it
-  includes all instructions, no chat context)
-- Logic:
-  1. Get current UTC date via `date` shell command (not LLM's internal date sense — unreliable)
-  2. Query arXiv API directly with `cat:cs.AI OR cat:cs.CL` + `submittedDate` range for last
-     3 days (mechanical filtering pushed to arXiv's API, not done by the LLM)
-  3. Hermes makes a semantic in-scope/out-of-scope judgment per paper based on title+abstract,
-     using the scope definition from `docs/initial_plan.md` (NOT simple keyword matching —
-     that's brittle and underuses the LLM's actual strength)
-  4. Writes one markdown file per in-scope paper to `sources/arxiv-<arxiv_id>.md`
-- 3-day lookback (not "today only") deliberately overlaps runs — covers late-indexed papers.
-  Combined with ID-based filenames, overlap costs nothing.
-- Cron job created (`hermes cron create "0 7 * * *" ...`, daily 07:00) but **gateway not yet
-  running** — job won't fire automatically until `hermes gateway install` is run.
 
 ## GitHub framework discovery track
 
@@ -164,4 +125,4 @@ less suited to a headless pipeline). `llm-wiki-compiler`:
 - Project root is the repo root (`.llmwiki/`, `sources/`, compiled `wiki/` all live there) —
   required because `llmwiki` reads `sources/` non-recursively and rejects all symlinks
   (even in-tree), so source files must be real, flat files directly in `sources/`
-- Compile pending against current `sources/` (arXiv + GitHub combined)
+- Compile pending against current `sources/`

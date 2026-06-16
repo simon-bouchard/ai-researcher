@@ -1,7 +1,7 @@
 # AI/LLM/Agents Intelligence Tracker
 
-A continuously-updated awareness index of the AI agent ecosystem (frameworks + research),
-designed to be queried by LLMs and coding agents whose training data has a knowledge cutoff.
+A continuously-updated awareness index of AI agent frameworks, designed to be queried by LLMs
+and coding agents whose training data has a knowledge cutoff.
 
 **The problem it solves:** AI moves fast, and LLMs are generally unaware of frameworks and
 approaches that emerged after their training cutoff. This pipeline builds a knowledge base that
@@ -29,27 +29,14 @@ clear provenance.
 
 ---
 
-## Hermes scraping tracks
-
-### 1. arXiv research track (daily)
-
-- Queries the arXiv API for `cs.AI` + `cs.CL` papers from the last 3 days
-- Mechanical filtering (date range, categories) is pushed to the arXiv API
-- Hermes makes a semantic in/out-of-scope judgment per paper from title + abstract
-- Writes one file per in-scope paper: `sources/arxiv-<arxiv_id>.md`
-- 3-day lookback overlaps runs intentionally — covers late-indexed papers; ID-based filenames
-  make re-scraping the same paper a free overwrite
-- Prompt: `prompts/arxiv_research.md`
-- Cron: daily 07:00 UTC (`hermes cron create "0 7 * * *" ...`) — **gateway not yet running**
-
-### 2. GitHub framework discovery track
+## Hermes scraping — GitHub framework discovery
 
 Two cadences, both using the same two-script architecture:
 
 **Popular (weekly):** established frameworks with >3000 stars  
 **Emerging (daily):** repos created in the last 30 days with >50 stars
 
-#### Two-script architecture
+### Two-script architecture
 
 The LLM's role is limited to semantic judgment only — all mechanical work is handled by Python
 scripts so that README content never passes through the LLM's context window:
@@ -64,8 +51,7 @@ scripts so that README content never passes through the LLM's context window:
    - Returns a JSON array of candidates (capped at 20 per run)
    - Caches full metadata to `/tmp/github_candidates.json` for the write script
 
-2. **Hermes (LLM) judges each candidate** from `full_name` + `description` + `topics` +
-   `readme_preview` only — never reads the full README
+2. **Hermes (LLM) judges each candidate** from `description` + `topics` + `readme_preview`
 
 3. **`scripts/github_write.py owner/repo1 owner/repo2 ...`** (in-scope repos)
    - Reads metadata from the filter cache
@@ -73,11 +59,11 @@ scripts so that README content never passes through the LLM's context window:
    - Writes `sources/github-<owner>_<repo>.md`
 
 4. **`scripts/github_filter.py --reject owner/repo1 ...`** (out-of-scope repos)
-   - Adds to `scripts/github_rejected.json` so they are skipped in all future runs
+   - Adds to `scripts/github_rejected.json` — skipped in all future runs
 
 Prompts: `prompts/github_frameworks_popular.md`, `prompts/github_frameworks_emerging.md`
 
-#### Initial ingestion
+### Initial ingestion
 
 For the first run (large backlog), use the bootstrap script which loops until the filter
 returns empty:
@@ -94,7 +80,7 @@ returns empty:
 
 `llm-wiki-compiler` ingests `sources/` and builds a structured, interlinked wiki:
 - Hash-based incremental ingestion — only re-processes changed files
-- Content-aware deduplication — concepts shared across arXiv papers and GitHub READMEs merge
+- Content-aware deduplication — concepts shared across READMEs merge into single pages
 - Citations trace every wiki page back to its source file
 - `llmwiki query` / `llmwiki context` provide hybrid semantic + BM25 + graph retrieval
 - MCP server exposes the query interface directly to coding agents
@@ -106,11 +92,9 @@ Config: `OPENAI_API_KEY`, `LLMWIKI_PROVIDER`, `LLMWIKI_MODEL` in `.env` (loaded 
 ## Repo structure
 
 ```
-sources/                        flat markdown files (one per scraped item)
-  arxiv-<id>.md                 arXiv papers (YAML frontmatter + verbatim abstract)
-  github-<owner>_<repo>.md      GitHub repos (YAML frontmatter + verbatim README)
+sources/                        flat markdown files (one per scraped repo)
+  github-<owner>_<repo>.md      YAML frontmatter + verbatim README
 prompts/
-  arxiv_research.md             self-contained Hermes prompt for arXiv track
   github_frameworks_popular.md  Hermes prompt for weekly popular-frameworks run
   github_frameworks_emerging.md Hermes prompt for daily emerging-frameworks run
 scripts/
