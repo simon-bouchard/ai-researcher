@@ -20,11 +20,13 @@ renamed for direct compatibility, avoiding a symlink (which `llmwiki` excludes a
 ## Status
 
 - [x] Hermes installed and configured locally
-- [x] arXiv research-track prototype validated (70 papers in `sources/arxiv-*.md`)
+- [x] arXiv research-track validated (70+ papers in `sources/arxiv-*.md`)
 - [x] WikiLLM implementation chosen: `llm-wiki-compiler`
-- [ ] `llm-wiki-compiler` run against `/sources` (project initialized at repo root)
-- [ ] Cron automation (gateway) enabled for daily runs
-- [ ] Framework-discovery track (GitHub trending, HN, etc.)
+- [x] GitHub framework discovery track designed and implemented (`scripts/`)
+- [x] GitHub popular track initial run done (~84 files in `sources/github-*.md`)
+- [ ] GitHub emerging track not yet tested
+- [ ] `llm-wiki-compiler` compile against current `/sources` pending
+- [ ] Cron automation (gateway) not yet enabled — `hermes gateway install` still needed
 - [ ] Query agent
 
 ## Hermes setup notes
@@ -49,7 +51,7 @@ re-scraping the same item overwrites the file — free dedup, no extra logic nee
 keeping provenance visible in the filename (also recorded in the `source` frontmatter field).
 Dedup *across sources* is WikiLLM's job at ingestion.
 
-YAML frontmatter schema (arXiv example):
+### arXiv frontmatter schema
 
 ```yaml
 ---
@@ -68,6 +70,25 @@ scraped_at: "<ISO 8601 UTC>"
 <abstract verbatim>
 ```
 
+### GitHub frontmatter schema
+
+```yaml
+---
+name: "<repo name without owner>"
+repo: "<owner>/<repo>"
+url: "https://github.com/<owner>/<repo>"
+description: "<repo description>"
+stars: <int>
+language: "<primary language>"
+topics: ["...", "..."]
+created_at: "YYYY-MM-DD"
+pushed_at: "YYYY-MM-DD"
+source: github
+scraped_at: "<ISO 8601 UTC>"
+---
+<README verbatim>
+```
+
 ## arXiv research track
 
 - Prompt: `prompts/arxiv_research.md` (self-contained — cron jobs run in fresh sessions, so it
@@ -80,11 +101,56 @@ scraped_at: "<ISO 8601 UTC>"
      using the scope definition from `docs/initial_plan.md` (NOT simple keyword matching —
      that's brittle and underuses the LLM's actual strength)
   4. Writes one markdown file per in-scope paper to `sources/arxiv-<arxiv_id>.md`
-- 3-day lookback (not "today only") deliberately overlaps runs — covers late-indexed papers
-  and (for future sources like GitHub trending) items that take time to gain traction.
+- 3-day lookback (not "today only") deliberately overlaps runs — covers late-indexed papers.
   Combined with ID-based filenames, overlap costs nothing.
 - Cron job created (`hermes cron create "0 7 * * *" ...`, daily 07:00) but **gateway not yet
   running** — job won't fire automatically until `hermes gateway install` is run.
+
+## GitHub framework discovery track
+
+Two cadences driven by a mode preset (implementation detail hidden from the LLM prompt):
+
+- **Popular** (`--mode popular`): min 3000 stars, no date filter, weekly cadence
+- **Emerging** (`--mode emerging`): min 50 stars, created within last 30 days, daily cadence
+
+Topics queried (one GitHub Search API call per topic, paginated for full coverage, then merged
+and deduped): `llm-agent`, `ai-agent`, `agent-framework`, `autonomous-agents`,
+`multi-agent-systems`, `llm-agents`.
+
+### Two-script architecture (key design decision)
+
+README content must never pass through the LLM's context window (cost + context size).
+The LLM only handles semantic in/out-of-scope judgment:
+
+- **`scripts/github_filter.py --mode <mode>`**: fetches candidates from GitHub API, applies
+  two mechanical pre-filters (change-detection via `pushed_at`, rejection list), fetches first
+  ~2 KB of README as preview for LLM judgment. Caches full metadata to
+  `/tmp/github_candidates.json`. Capped at 20 candidates per run (batching).
+- **Hermes (LLM)**: judges in/out of scope from `description` + `topics` + `readme_preview`
+- **`scripts/github_write.py owner/repo ...`**: for in-scope repos — reads cache, fetches full
+  README, writes `sources/github-<owner>_<repo>.md`. No LLM involved.
+- **`scripts/github_filter.py --reject owner/repo ...`**: records out-of-scope repos to
+  `scripts/github_rejected.json` — permanently skipped in all future runs.
+
+### Prompts
+
+- `prompts/github_frameworks_popular.md` — weekly popular run
+- `prompts/github_frameworks_emerging.md` — daily emerging run
+
+Both include "do not ask for confirmation / do not narrate" instructions at the top (Hermes
+would otherwise pause on large candidate lists).
+
+### Initial ingestion
+
+For the first run (large backlog), loop until filter returns empty:
+```bash
+./scripts/ingest_all.sh  # loops hermes run until no new files or rejections
+```
+
+### Cleanup needed
+
+`scripts/github_pipeline.py` is an outdated file from early experimentation (keyword-based
+in_scope filter, fetches full README — both superseded). Safe to delete.
 
 ## WikiLLM: `llm-wiki-compiler`
 
@@ -98,4 +164,4 @@ less suited to a headless pipeline). `llm-wiki-compiler`:
 - Project root is the repo root (`.llmwiki/`, `sources/`, compiled `wiki/` all live there) —
   required because `llmwiki` reads `sources/` non-recursively and rejects all symlinks
   (even in-tree), so source files must be real, flat files directly in `sources/`
-- Not yet run as of this writing — compile pending
+- Compile pending against current `sources/` (arXiv + GitHub combined)
