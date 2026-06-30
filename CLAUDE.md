@@ -6,25 +6,25 @@ Full background and architecture: see `docs/initial_plan.md`.
 ## Pipeline
 
 ```
-Hermes (scrape/extract, scheduled) -> /sources (markdown + frontmatter) -> WikiLLM (structure/dedupe) -> query agent
+Hermes (scrape/extract, scheduled) -> /sources (markdown + frontmatter) -> update_topic_hints.py -> WikiLLM (structure/dedupe) -> query agent
 ```
 
 **Core design principle (separation of concerns):** Hermes only searches, extracts, and formats —
 it never summarizes or edits source content. Summarization/synthesis happens downstream
 (WikiLLM ingestion / query agent), so `/sources` always contains untouched source material.
 
-Note: `/sources` is named to match `llm-wiki-compiler`'s expected project layout (it reads from
-a `sources/` directory at the project root). It was originally called `/raw` in early planning —
-renamed for direct compatibility, avoiding a symlink (which `llmwiki` excludes as "out-of-tree").
+Note: `/sources` was originally called `/raw` in early planning — renamed when the first WikiLLM
+implementation was chosen. The current implementation (ussumant/llm-wiki-compiler) configures
+source paths in `.wiki-compiler.json`, so `sources/` is now just the established convention.
 
 ## Status
 
 - [x] Hermes installed and configured locally
-- [x] WikiLLM implementation chosen: `llm-wiki-compiler`
+- [x] WikiLLM implementation chosen: `ussumant/llm-wiki-compiler` (Claude Code plugin)
 - [x] GitHub framework discovery track designed and implemented (`scripts/`)
 - [x] GitHub popular track initial run done (~84 files in `sources/github-*.md`)
 - [ ] GitHub emerging track not yet tested
-- [ ] `llm-wiki-compiler` compile against current `/sources` pending
+- [ ] WikiLLM: install plugin → `/wiki-init` → draft compile → edit `wiki/schema.md` → wipe + recompile
 - [ ] Cron automation (gateway) not yet enabled — `hermes gateway install` still needed
 - [ ] Query agent
 
@@ -43,8 +43,7 @@ renamed for direct compatibility, avoiding a symlink (which `llmwiki` excludes a
 
 ## `/sources` output format
 
-One markdown file per repo, in a flat `sources/` directory (required by `llm-wiki-compiler` —
-it does not recurse into subdirectories and rejects symlinks, even in-tree ones). Filenames
+One markdown file per repo, in a flat `sources/` directory (path configured in `.wiki-compiler.json`). Filenames
 use the pattern `github-<owner>_<repo>.md`, so re-scraping the same repo overwrites the file —
 free dedup, no extra logic needed. Dedup across sources is WikiLLM's job at ingestion.
 
@@ -92,6 +91,8 @@ The LLM only handles semantic in/out-of-scope judgment:
   README, writes `sources/github-<owner>_<repo>.md`. No LLM involved.
 - **`scripts/github_filter.py --reject owner/repo ...`**: records out-of-scope repos to
   `scripts/github_rejected.json` — permanently skipped in all future runs.
+- **`scripts/update_topic_hints.py`**: syncs `.wiki-compiler.json` `topic_hints` from
+  `sources/` filenames — run after Hermes, before `/wiki-compile`.
 
 ### Prompts
 
@@ -113,16 +114,64 @@ For the first run (large backlog), loop until filter returns empty:
 `scripts/github_pipeline.py` is an outdated file from early experimentation (keyword-based
 in_scope filter, fetches full README — both superseded). Safe to delete.
 
-## WikiLLM: `llm-wiki-compiler`
+## WikiLLM: `ussumant/llm-wiki-compiler`
 
-Chosen over `nvk/llm-wiki` (which is a Claude Code/Codex plugin driven via slash commands,
-less suited to a headless pipeline). `llm-wiki-compiler`:
-- Standalone Node.js CLI/SDK (Node >=24), supports OpenAI as provider (configured via
-  `.env` + `.envrc`/direnv: `OPENAI_API_KEY`, `LLMWIKI_PROVIDER`, `LLMWIKI_MODEL`)
-- Hash-based incremental ingestion + content-aware deduplication
-- Built-in `llmwiki query` (hybrid semantic + BM25 + graph retrieval) — candidate to double
-  as the query-agent layer for this prototype
-- Project root is the repo root (`.llmwiki/`, `sources/`, compiled `wiki/` all live there) —
-  required because `llmwiki` reads `sources/` non-recursively and rejects all symlinks
-  (even in-tree), so source files must be real, flat files directly in `sources/`
-- Compile pending against current `sources/`
+Chosen over `atomicstrata/llm-wiki-compiler` (standalone Node.js CLI) because the standalone
+tool has a hardcoded extraction prompt with no customization mechanism — all extracted pages
+receive the same `defaultKind`, and schema `kinds` descriptions are never injected into any
+extraction or page-writing prompt. The Claude Code plugin approach gives full control over
+extraction via a natural language `schema.md` that the compiler reads before every run.
+
+- **Claude Code plugin** — invoked via slash commands (`/wiki-init`, `/wiki-compile`, `/wiki-query`)
+- **Customizable extraction:** `schema.md` (natural language, in `wiki/schema.md`) defines
+  entity types, tagging conventions, article structure, and cross-reference rules — the compiler
+  reads and respects it on every run
+- **Config:** `.wiki-compiler.json` at project root — source paths, article sections, topic hints
+- **Incremental:** only recompiles topics whose source files changed
+- **Automated via cron:** `claude -p "/wiki-compile"` runs fully autonomously once config exists —
+  no interactive approval gates after initial setup
+
+### CLAUDE.md vs wiki/schema.md separation
+
+Both files are loaded during a Claude Code compile session (CLAUDE.md files are additive, not
+replacing — a `wiki/CLAUDE.md` would stack on top of root CLAUDE.md, not replace it). This means:
+
+- **`CLAUDE.md`** (this file) — developer instructions for Claude Code when working on the
+  project. Keep it dev-focused. Avoid instructions that could conflict with autonomous
+  compilation (e.g. "always confirm before writing files").
+- **`wiki/schema.md`** — wiki compilation schema read by the compiler on every run. All domain
+  conventions belong here, not in CLAUDE.md.
+
+### Setup workflow
+
+**Step 1 — Install the plugin**
+Add `ussumant/llm-wiki-compiler` to Claude Code plugins.
+
+**Step 2 — Run `/wiki-init` interactively**
+Init samples `sources/` and proposes an article structure. Before approving, give it domain
+context: each GitHub repo should produce one entity page for the framework itself; cross-cutting
+patterns (ReAct, tool-calling, memory approaches, etc.) become separate concept pages. Adjust
+the proposed article sections to match — something like: Summary, Core Pattern, Key Features,
+Tech Stack, Traction, Use Cases, Related Frameworks, Sources. Init writes `.wiki-compiler.json`.
+`topic_hints` is populated automatically by `scripts/update_topic_hints.py` — no manual editing needed.
+
+**Step 3 — First compile (draft run)**
+Run `/wiki-compile`. This generates `wiki/schema.md` for the first time. The wiki output at
+this stage is a draft — expect imperfect entity/concept classification. The goal of this run
+is purely to produce `wiki/schema.md` as a starting point to edit.
+
+**Step 4 — Edit `wiki/schema.md`**
+Refine the generated schema to encode domain conventions explicitly:
+- Each source file (`github-<owner>_<repo>.md`) → one entity page for that framework
+- Cross-cutting architectural patterns appearing across multiple repos → concept pages
+- Do not create sub-feature pages for things mentioned in only one repo
+
+**Step 5 — Wipe and recompile**
+Delete the draft wiki output and recompile with the corrected schema in place. This is the
+first meaningful compile.
+
+**Step 6 — Commit and automate**
+Commit `.wiki-compiler.json` + `wiki/schema.md`. Subsequent compiles on any machine:
+```bash
+claude -p "/wiki-compile"   # fully autonomous, no approval gates
+```

@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "name": "Ai agents framework tracker",
+  "sources": [
+    {
+      "path": "sources/"
+    }
+  ],
+  "output": "wiki/",
+  "mode": "staging",
+  "auto_update": "off",
+  "article_sections": [
+    {
+      "name": "Summary",
+      "description": "What the framework does and its key value proposition",
+      "required": true
+    },
+    {
+      "name": "Core Pattern",
+      "description": "Orchestration approach, key abstractions (multi-agent, workflow, memory, tool-calling, etc.)"
+    },
+    {
+      "name": "Key Features",
+      "description": "Notable capabilities: MCP support, RAG, UI, self-hosting, etc."
+    },
+    {
+      "name": "Tech Stack",
+      "description": "Primary language, deployment model, notable dependencies"
+    },
+    {
+      "name": "Traction",
+      "description": "Relevance/adoption signals \u2014 stars, activity level, community signals, and other metrics as sources diversify beyond GitHub"
+    },
+    {
+      "name": "Use Cases",
+      "description": "What it's best suited for (automation, research, production, etc.)"
+    },
+    {
+      "name": "Related Frameworks",
+      "description": "Similar or competing frameworks, and how this one differs"
+    },
+    {
+      "name": "Sources",
+      "description": "backlinks to all contributing source files",
+      "required": true
+    }
+  ],
+  "topic_hints": [
+    "AReaL",
+    "Agent-Reach",
+    "CowAgent",
+    "DeepSeek-Reasonix",
+    "GenericAgent",
+    "OpenCLI",
+    "PocketFlow",
+    "activepieces",
+    "agentscope",
+    "autogen",
+    "evolver",
+    "gptme",
+    "harness-sdk",
+    "hermes-agent",
+    "langroid",
+    "letta",
+    "nanobot",
+    "openclaude"
+  ],
+  "link_style": "obsidian"
+}

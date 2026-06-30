@@ -88,19 +88,22 @@ accompanying paper). This is acceptable — deduplication is handled at the Wiki
 stage.
 
 Scraped content is dropped into a flat `/sources` folder for ingestion (filenames prefixed by
-source type and ID, e.g. `arxiv-<id>.md`, `github-<owner>_<repo>.md` — required by the chosen
-WikiLLM implementation, which reads `sources/` non-recursively and rejects symlinks).
+source type and ID, e.g. `arxiv-<id>.md`, `github-<owner>_<repo>.md`). Source path is
+configured in `.wiki-compiler.json`.
 
 ### 2. Knowledge Base — WikiLLM
 
-**Chosen implementation: `llm-wiki-compiler`** (standalone Node.js CLI/SDK, OpenAI-compatible).
+**Chosen implementation: `ussumant/llm-wiki-compiler`** (Claude Code plugin).
 It ingests `/sources` and builds a structured, interlinked wiki:
 
-- Hash-based incremental ingestion + content-aware deduplication (concepts shared across
-  multiple sources merge into single pages) — covers dedup between tracks
-- Citations trace every claim back to its source file
-- Built-in `llmwiki query` (hybrid semantic + BM25 + graph retrieval) and `llmwiki context`
-  (agent-ready evidence packs, also exposed via MCP) — see Query Agent below
+- **Customizable extraction schema:** `wiki/schema.md` is a natural language document the
+  compiler reads before every run — defines entity types, article structure, tagging conventions,
+  and cross-reference rules. This is the key reason for choosing this implementation over
+  standalone CLI tools, which have hardcoded extraction prompts with no override mechanism.
+- Hash-based incremental compilation — only recompiles topics whose source files changed
+- Automated via `claude -p "/wiki-compile"` in cron once `.wiki-compiler.json` and `schema.md`
+  are committed to the repo (one-time interactive `/wiki-init` required to bootstrap config)
+- Query interface via `/wiki-query` slash command
 
 ### 3. Query Agent
 
@@ -118,8 +121,8 @@ scratch is likely unnecessary.
 At the end of this project:
 
 - Hermes runs on cron schedules for both tracks, reliably depositing scraped content into `/sources`
-- `llm-wiki-compiler` ingests that content and maintains an up-to-date, citation-backed wiki
-- A coding agent can query the wiki (via `llmwiki query`/`context`/MCP) to get an answer like
+- `ussumant/llm-wiki-compiler` ingests that content and maintains an up-to-date, citation-backed wiki
+- A coding agent can query the wiki (via `/wiki-query`) to get an answer like
   "yes, framework X exists, here's roughly what it does, here's where to verify current details"
 - The pipeline is understood well enough to reason about how it would transfer to the
   pharmaceutical use case
@@ -128,7 +131,7 @@ At the end of this project:
 
 ## Open Questions
 
-- ~~Which WikiLLM implementation to use~~ — resolved: `llm-wiki-compiler`
+- ~~Which WikiLLM implementation to use~~ — resolved: `ussumant/llm-wiki-compiler` (Claude Code plugin with customizable `schema.md`; chosen over standalone CLI tools for extraction control)
 - Framework discovery track: exact GitHub search query (topics + free-text), star thresholds
   for the "emerging" query, and the change-detection check (compare `pushed_at`)
 - Whether/when to revisit ingestion depth (e.g. full PDF text for papers) if the query agent's
