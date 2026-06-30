@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 """
 Fetch full READMEs and write sources/github-<owner>_<repo>.md files for
-repos judged in-scope by the LLM.
+repos judged in-scope by the LLM. Also records out-of-scope repos to the
+rejection list so they are skipped in future filter runs.
 
 Reads repo metadata from the filter cache (/tmp/github_candidates.json).
 Falls back to querying the GitHub API directly if a repo is not in the cache.
 
-Usage: github_write.py "owner/repo1" "owner/repo2" ...
+Usage:
+  github_write.py "owner/repo1" "owner/repo2" ...          # write in-scope repos
+  github_write.py --reject "owner/repo1" "owner/repo2" ... # record out-of-scope repos
 """
 
+import argparse
 import datetime
 import json
 import os
@@ -20,6 +24,7 @@ SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 REPO_ROOT = os.path.dirname(SCRIPTS_DIR)
 SOURCES_DIR = os.path.join(REPO_ROOT, "sources")
 CANDIDATES_CACHE = "/tmp/github_candidates.json"
+REJECTED_FILE = os.path.join(SCRIPTS_DIR, "github_rejected.json")
 
 _first_request = True
 
@@ -99,15 +104,37 @@ scraped_at: "{scraped_at}"
     print(f"  wrote {filename} ({len(readme)} chars)")
 
 
+def load_rejected():
+    if not os.path.exists(REJECTED_FILE):
+        return set()
+    with open(REJECTED_FILE, "r", encoding="utf-8") as f:
+        return set(json.load(f))
+
+
+def save_rejected(rejected_set):
+    with open(REJECTED_FILE, "w", encoding="utf-8") as f:
+        json.dump(sorted(rejected_set), f, indent=2)
+
+
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: github_write.py owner/repo1 owner/repo2 ...", file=sys.stderr)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("repos", nargs="*", metavar="owner/repo")
+    parser.add_argument("--reject", nargs="+", metavar="owner/repo")
+    args = parser.parse_args()
+
+    if args.reject:
+        rejected = load_rejected()
+        rejected.update(args.reject)
+        save_rejected(rejected)
+        print(f"  recorded {len(args.reject)} rejection(s)")
+        return
+
+    if not args.repos:
+        parser.print_usage(sys.stderr)
         sys.exit(1)
 
-    full_names = sys.argv[1:]
     cache = load_cache()
-
-    for full_name in full_names:
+    for full_name in args.repos:
         print(f"Processing {full_name}...")
         meta = cache.get(full_name) or fetch_repo_meta(full_name)
         readme = fetch_readme(full_name, meta["default_branch"])

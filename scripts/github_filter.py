@@ -19,9 +19,6 @@ Usage:
   # Filter run with explicit parameters (for scripting/testing)
   github_filter.py --min-stars N [--created-after-days N] [--limit N] [--topics t1,t2,...]
 
-  # Reject run — records out-of-scope repos so they are skipped in future runs
-  github_filter.py --reject "owner/repo1" "owner/repo2" ...
-
 Mode presets:
   popular:  --min-stars 3000 --limit 20
   emerging: --min-stars 50 --created-after-days 30 --limit 20
@@ -60,10 +57,6 @@ def load_rejected():
     with open(REJECTED_FILE, "r", encoding="utf-8") as f:
         return set(json.load(f))
 
-
-def save_rejected(rejected_set):
-    with open(REJECTED_FILE, "w", encoding="utf-8") as f:
-        json.dump(sorted(rejected_set), f, indent=2)
 
 
 def existing_pushed_at(full_name):
@@ -200,15 +193,9 @@ def main():
     parser.add_argument("--limit", type=int, default=None,
                         help="max candidates to return per run (for batched ingestion)")
     parser.add_argument("--topics", default=",".join(DEFAULT_TOPICS))
-    parser.add_argument("--reject", nargs="+", metavar="owner/repo")
-
     args = parser.parse_args()
 
-    if args.reject:
-        rejected = load_rejected()
-        rejected.update(args.reject)
-        save_rejected(rejected)
-    elif args.mode or args.min_stars is not None:
+    if args.mode or args.min_stars is not None:
         if args.mode:
             preset = MODE_PRESETS[args.mode]
             args.min_stars = args.min_stars or preset["min_stars"]
