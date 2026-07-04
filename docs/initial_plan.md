@@ -69,11 +69,6 @@ filtering (date ranges, categories, keywords) to each source's own API where pos
 makes a semantic in-scope/out-of-scope judgment on what's returned. Summarization/synthesis is
 WikiLLM's job, downstream.
 
-**Research track** (validated):
-- arXiv (cs.AI, cs.CL, filtered by submission date range via arXiv's API; in-scope judgment
-  by Hermes; abstract stored verbatim — see `prompts/arxiv_research.md`)
-- Possible future additions: Semantic Scholar, key practitioner blogs, HuggingFace papers
-
 **Framework discovery track** (implemented and running):
 - GitHub Search API, two cadences:
   - Weekly: established/popular frameworks (sorted by stars) — with change-detection
@@ -143,3 +138,6 @@ At the end of this project:
   `hermes gateway` not needed
 - Whether a thin query-agent wrapper around `llmwiki context`/MCP is needed, or direct use
   suffices
+- Re-ingest frequency for changed repos: currently any `pushed_at` change triggers re-ingestion,
+  which will cause churn on repos with frequent minor commits. Consider ignoring `pushed_at`
+  changes on already-ingested repos and only re-ingesting on a monthly cadence instead.

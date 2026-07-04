@@ -1,7 +1,7 @@
 ---
 concept: Human-in-the-Loop as Production Primitive
-last_compiled: 2026-07-03
-topics_connected: [activepieces_activepieces, agentscope-ai_agentscope, camel-ai_camel, aden-hive_hive, cft0808_edict, gptme_gptme, langroid_langroid, microsoft_agent-framework, microsoft_autogen, nousresearch_hermes-agent, othmanadi_planning-with-files, pydantic_pydantic-ai, strands-agents_harness-sdk, evomap_evolver, google_adk-python]
+last_compiled: 2026-07-04
+topics_connected: [activepieces_activepieces, agentscope-ai_agentscope, camel-ai_camel, aden-hive_hive, cft0808_edict, gptme_gptme, langroid_langroid, microsoft_agent-framework, microsoft_autogen, nousresearch_hermes-agent, othmanadi_planning-with-files, pydantic_pydantic-ai, strands-agents_harness-sdk, evomap_evolver, google_adk-python, duckbugio_flock, omnigent-ai_omnigent]
 status: active
 ---
 
@@ -9,7 +9,7 @@ status: active
 
 ## Pattern
 
-Human-in-the-loop (HITL) — pausing agent execution for human review, approval, or correction — appears in 15 of the 37 tracked frameworks, but the interesting observation is *where* in the architecture the pause is inserted. The implementations span at least four distinct layers: the tool level (flag individual tool calls for approval), the workflow level (pause nodes in an automation graph), the governance level (mandatory institutional review that can veto plans), and the harness level (pre-action guardrails that catch classes of mistakes before they execute). Each layer reflects a different mental model of what human oversight means in a production agentic system.
+Human-in-the-loop (HITL) — pausing agent execution for human review, approval, or correction — appears in 17 of the 40 tracked frameworks, but the interesting observation is *where* in the architecture the pause is inserted. The implementations span at least five distinct layers: the tool level (flag individual tool calls for approval), the workflow level (pause nodes in an automation graph), the governance level (mandatory institutional review that can veto plans), the harness level (pre-action guardrails that catch classes of mistakes before they execute), and the pipeline-arbiter level (a dedicated stage whose only job is deciding whether to approve or escalate). Each layer reflects a different mental model of what human oversight means in a production agentic system.
 
 The convergence on HITL as a feature is not accidental — it reflects the state of the field in 2026. Autonomous agents are capable enough to be useful on complex tasks but not reliable enough to be trusted without oversight. HITL is how production teams manage this gap. The diversity of implementations suggests the field has not settled on which abstraction is most useful.
 
@@ -30,6 +30,8 @@ The convergence on HITL as a feature is not accidental — it reflects the state
 - **2026-06-16** in [[../topics/strands-agents_harness-sdk]]: Guardrails catch mistakes before tool calls execute; steering handlers let agents self-correct — HITL replaced partially by automated guardrails, reducing the need for human intervention
 - **2026-06-15** in [[../topics/evomap_evolver]]: `--review` mode for human-in-the-loop confirmation before each evolution step; auto GitHub issue filing on persistent failure loops — HITL at the *self-evolution* level, a novel application
 - **2026-07-03** in [[../topics/google_adk-python]]: Human-in-the-loop support at both Task and Workflow levels of the graph-based runtime — HITL integrated at multiple abstraction levels
+- **2026-07-02** in [[../topics/duckbugio_flock]]: Dedicated arbiter subagent is the sole gate between reviewer/coder cycles and merge — it either APPROVEs or ESCALATEs to the human who opened the chat; a distinct "pipeline arbiter" layer not seen elsewhere in the tracked set, separate from both tool-level approval and workflow pause nodes
+- **2026-07-04** in [[../topics/omnigent-ai_omnigent]]: Function-based policy engine (e.g. `ask_on_os_tools`) pauses for approval before shell/file actions, stacked across server-wide, per-agent, and per-session scopes with stricter session rules checked first — HITL as a cross-cutting, declaratively configured policy rather than code baked into one agent
 
 ## What This Means
 
@@ -40,6 +42,8 @@ The Strands/gptme approach (automated guardrails that catch whole classes of mis
 The MAF time-travel + restartability pairing is the most production-mature implementation: HITL pause nodes that survive process restarts mean an agent can pause for human review, the server can restart, and the review is still pending when it comes back up. Most HITL implementations lose state across restarts.
 
 The broader pattern: HITL in 2026 is not a research feature. Every serious production-grade agent framework has it. The question is no longer "should agents be controllable?" but "at what layer and with what semantics should control be inserted?" The field has not converged on an answer, and the diversity of implementations suggests there may not be a single right answer — different use cases need different control points.
+
+Flock's arbiter and Omnigent's policy engine add a fifth distinct answer: instead of a pause node in a workflow graph or a per-tool flag, the decision of *whether* to involve a human is itself delegated to a dedicated component (an arbiter agent, a policy handler) that can be reasoned about and tested independently of the task-execution logic. This is a step toward treating "when to ask a human" as its own engineering problem rather than an afterthought bolted onto the execution loop.
 
 ## Sources
 
@@ -58,3 +62,5 @@ The broader pattern: HITL in 2026 is not a research feature. Every serious produ
 - [[../topics/strands-agents_harness-sdk]]
 - [[../topics/evomap_evolver]]
 - [[../topics/google_adk-python]]
+- [[../topics/duckbugio_flock]]
+- [[../topics/omnigent-ai_omnigent]]

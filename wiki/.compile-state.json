@@ -1,5 +1,5 @@
 {
-  "last_compiled": "2026-07-03",
+  "last_compiled": "2026-07-04",
   "topics": [
     "activepieces_activepieces",
     "aden-hive_hive",
@@ -10,9 +10,11 @@
     "camel-ai_owl",
     "can1357_oh-my-pi",
     "cft0808_edict",
+    "duckbugio_flock",
     "e2b-dev_e2b",
     "esengine_deepseek-reasonix",
     "evomap_evolver",
+    "forsy-ai_agent-apprenticeship",
     "gitlawb_openclaude",
     "google_adk-python",
     "gptme_gptme",
@@ -24,6 +26,7 @@
     "microsoft_agent-framework",
     "microsoft_autogen",
     "nousresearch_hermes-agent",
+    "omnigent-ai_omnigent",
     "opensandbox-group_opensandbox",
     "othmanadi_planning-with-files",
     "panniantong_agent-reach",
@@ -57,9 +60,11 @@
     "sources/github-camel-ai_owl.md",
     "sources/github-can1357_oh-my-pi.md",
     "sources/github-cft0808_edict.md",
+    "sources/github-duckbugio_flock.md",
     "sources/github-e2b-dev_E2B.md",
     "sources/github-esengine_DeepSeek-Reasonix.md",
     "sources/github-EvoMap_evolver.md",
+    "sources/github-Forsy-AI_agent-apprenticeship.md",
     "sources/github-Gitlawb_openclaude.md",
     "sources/github-google_adk-python.md",
     "sources/github-gptme_gptme.md",
@@ -71,6 +76,7 @@
     "sources/github-microsoft_agent-framework.md",
     "sources/github-microsoft_autogen.md",
     "sources/github-NousResearch_hermes-agent.md",
+    "sources/github-omnigent-ai_omnigent.md",
     "sources/github-opensandbox-group_OpenSandbox.md",
     "sources/github-OthmanAdi_planning-with-files.md",
     "sources/github-Panniantong_Agent-Reach.md",
@@ -96,9 +102,11 @@
     "sources/github-camel-ai_owl.md": "compiled-2026-07-03",
     "sources/github-can1357_oh-my-pi.md": "compiled-2026-07-03",
     "sources/github-cft0808_edict.md": "compiled-2026-07-03",
+    "sources/github-duckbugio_flock.md": "compiled-2026-07-04",
     "sources/github-e2b-dev_E2B.md": "compiled-2026-07-03",
     "sources/github-esengine_DeepSeek-Reasonix.md": "compiled-2026-07-03",
     "sources/github-EvoMap_evolver.md": "compiled-2026-07-03",
+    "sources/github-Forsy-AI_agent-apprenticeship.md": "compiled-2026-07-04",
     "sources/github-Gitlawb_openclaude.md": "compiled-2026-07-03",
     "sources/github-google_adk-python.md": "compiled-2026-07-03",
     "sources/github-gptme_gptme.md": "compiled-2026-07-03",
@@ -110,6 +118,7 @@
     "sources/github-microsoft_agent-framework.md": "compiled-2026-07-03",
     "sources/github-microsoft_autogen.md": "compiled-2026-07-03",
     "sources/github-NousResearch_hermes-agent.md": "compiled-2026-07-03",
+    "sources/github-omnigent-ai_omnigent.md": "compiled-2026-07-04",
     "sources/github-opensandbox-group_OpenSandbox.md": "compiled-2026-07-03",
     "sources/github-OthmanAdi_planning-with-files.md": "compiled-2026-07-03",
     "sources/github-Panniantong_Agent-Reach.md": "compiled-2026-07-03",
@@ -125,5 +134,5 @@
     "sources/github-Yeachan-Heo_oh-my-claudecode.md": "compiled-2026-07-03",
     "sources/github-zhayujie_CowAgent.md": "compiled-2026-07-03"
   },
-  "total_sources_scanned": 37
+  "total_sources_scanned": 40
 }

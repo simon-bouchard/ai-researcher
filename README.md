@@ -8,9 +8,6 @@ approaches that emerged after their training cutoff. This pipeline builds a know
 gives an agent *awareness that something exists, what it does, and how it broadly works* —
 plus a citation to the primary source so it can verify current details on demand.
 
-This is also a practice run for a monitoring pipeline architecture being considered for a
-pharmaceutical client (regulatory change tracking → structured knowledge base → analysis agent).
-
 ---
 
 ## Pipeline
@@ -33,8 +30,8 @@ clear provenance.
 
 Two cadences, both using the same two-script architecture:
 
-**Popular (weekly):** established frameworks with >3000 stars  
-**Emerging (daily):** repos created in the last 30 days with >50 stars
+**Popular (weekly):** established frameworks with >10k stars (conservative test threshold; target ~1000 for production)  
+**Emerging (daily):** repos created in the last 30 days with >500 stars (target 50–100 for production)
 
 ### Two-script architecture
 
@@ -58,8 +55,9 @@ scripts so that README content never passes through the LLM's context window:
    - Fetches the full README
    - Writes `sources/github-<owner>_<repo>.md`
 
-4. **`scripts/github_filter.py --reject owner/repo1 ...`** (out-of-scope repos)
+4. **`scripts/github_write.py --reject owner/repo1 ...`** (out-of-scope repos)
    - Adds to `scripts/github_rejected.json` — skipped in all future runs
+   - (`github_filter.py` is read-only; all writes go through `github_write.py`)
 
 Prompts: `prompts/github_frameworks_popular.md`, `prompts/github_frameworks_emerging.md`
 
@@ -76,33 +74,49 @@ returns empty:
 
 ## WikiLLM — llm-wiki-compiler
 
-**Status: pending** — `sources/` populated, compile not yet run in its final form.
+**Status: running** — 37 topic articles + 6 concept articles compiled, updated on every pipeline run.
 
-`llm-wiki-compiler` ingests `sources/` and builds a structured, interlinked wiki:
-- Hash-based incremental ingestion — only re-processes changed files
-- Content-aware deduplication — concepts shared across READMEs merge into single pages
-- Citations trace every wiki page back to its source file
-- `llmwiki query` / `llmwiki context` provide hybrid semantic + BM25 + graph retrieval
-- MCP server exposes the query interface directly to coding agents
+`llm-wiki-compiler` (Claude Code plugin) ingests `sources/` and builds a structured, interlinked wiki:
+- Schema-driven extraction: `wiki/schema.md` defines entity types, article sections, and cross-reference rules — read by the compiler on every run
+- Hash-based incremental compilation — only recompiles topics whose source files changed
+- Topic slugs use `owner_repo` format (e.g. `nousresearch_hermes-agent`) for guaranteed uniqueness
+- Query interface via `/llm-wiki-compiler:wiki-query`
 
-Config: `OPENAI_API_KEY`, `LLMWIKI_PROVIDER`, `LLMWIKI_MODEL` in `.env` (loaded via `.envrc`)
+## Orchestration — Airflow
+
+Two DAGs in `dags/github_frameworks.py` run the full pipeline on schedule:
+
+```
+ingest_all.sh  →  update_topic_hints.py  →  claude -p "/llm-wiki-compiler:wiki-compile"
+```
+
+- `github_frameworks_popular` — weekly
+- `github_frameworks_emerging` — daily
+
+Run locally with `airflow standalone` (see CLAUDE.md for setup).
 
 ---
 
 ## Repo structure
 
 ```
-sources/                        flat markdown files (one per scraped repo)
+sources/                        flat markdown files (one per scraped repo, gitignored)
   github-<owner>_<repo>.md      YAML frontmatter + verbatim README
 prompts/
   github_frameworks_popular.md  Hermes prompt for weekly popular-frameworks run
   github_frameworks_emerging.md Hermes prompt for daily emerging-frameworks run
 scripts/
-  github_filter.py              GitHub API fetch + change-detection + rejection filter
-  github_write.py               README fetch + source file writer (no LLM involved)
+  github_filter.py              GitHub API fetch + change-detection + rejection filter (read-only)
+  github_write.py               README fetch + source file writer + rejection recorder
   github_rejected.json          persistent list of out-of-scope repos (never re-evaluated)
-  ingest_all.sh                 bootstrap loop for initial ingestion
+  update_topic_hints.py         syncs topic_hints in .wiki-compiler.json from sources/ filenames
+  ingest_all.sh                 loops Hermes until filter returns empty
+dags/
+  github_frameworks.py          Airflow DAGs — popular (weekly) + emerging (daily)
 wiki/                           llm-wiki-compiler output (compiled knowledge base)
+  schema.md                     extraction schema — edit to refine classification conventions
+  topics/                       one article per framework (owner_repo slug)
+  concepts/                     cross-cutting pattern articles
 docs/
   initial_plan.md               full background, architecture decisions, open questions
 ```

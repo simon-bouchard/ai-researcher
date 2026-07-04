@@ -1,7 +1,7 @@
 # Ai Agents Framework Tracker Knowledge Base
 
-Last compiled: 2026-07-03
-Total topics: 37 | Total sources: 37 | Total concepts: 6
+Last compiled: 2026-07-04
+Total topics: 40 | Total sources: 40 | Total concepts: 6
 
 ## Topics
 
@@ -16,9 +16,11 @@ Total topics: 37 | Total sources: 37 | Total concepts: 6
 | [[topics/camel-ai_owl]] | OWL, Optimized Workforce Learning, GAIA benchmark, workforce orchestration | 1 | 2026-07-03 | active |
 | [[topics/can1357_oh-my-pi]] | omp, Oh My Pi, Pi fork, LSP, DAP, Rust core, hash-anchored edits | 1 | 2026-07-03 | active |
 | [[topics/cft0808_edict]] | Edict, 三省六部, Three Departments Six Ministries, OpenClaw, Tang Dynasty | 1 | 2026-07-03 | active |
+| [[topics/duckbugio_flock]] | Flock, Claude Code dev team, Telegram bot, VK bot, chat-driven PRs | 1 | 2026-07-04 | active |
 | [[topics/e2b-dev_e2b]] | E2B, cloud sandbox, code interpreter, secure execution | 1 | 2026-07-03 | active |
 | [[topics/esengine_deepseek-reasonix]] | DeepSeek-Reasonix, Reasonix, Go CLI, prefix cache, coding agent | 1 | 2026-07-03 | active |
 | [[topics/evomap_evolver]] | Evolver, EvoMap, GEP, Genome Evolution Protocol, Gene Capsule | 1 | 2026-07-03 | active |
+| [[topics/forsy-ai_agent-apprenticeship]] | Agent Apprenticeship, apprentice CLI, experience compilation, agent learning | 1 | 2026-07-04 | active |
 | [[topics/gitlawb_openclaude]] | OpenClaude, Claude Code fork, multi-provider, agentModels, gRPC | 1 | 2026-07-03 | active |
 | [[topics/google_adk-python]] | ADK, Agent Development Kit, Google, Gemini, graph-based workflow | 1 | 2026-07-03 | active |
 | [[topics/gptme_gptme]] | gptme, local-first, terminal agent, Bob agent, ACP | 1 | 2026-07-03 | active |
@@ -30,6 +32,7 @@ Total topics: 37 | Total sources: 37 | Total concepts: 6
 | [[topics/microsoft_agent-framework]] | MAF, Microsoft Agent Framework, AutoGen successor, A2A, Foundry | 1 | 2026-07-03 | active |
 | [[topics/microsoft_autogen]] | AutoGen, Microsoft, multi-agent, maintenance mode, MAF | 1 | 2026-07-03 | deprecated |
 | [[topics/nousresearch_hermes-agent]] | Hermes, Hermes Agent, NousResearch, closed learning loop, agentskills.io | 1 | 2026-07-03 | active |
+| [[topics/omnigent-ai_omnigent]] | Omnigent, meta-harness, multi-harness orchestration, policies, cloud sandboxes | 1 | 2026-07-04 | active |
 | [[topics/opensandbox-group_opensandbox]] | OpenSandbox, Alibaba, sandbox platform, CNCF, Kubernetes, gVisor | 1 | 2026-07-03 | active |
 | [[topics/othmanadi_planning-with-files]] | planning-with-files, SKILL.md, file-based planning, context recovery | 1 | 2026-07-03 | active |
 | [[topics/panniantong_agent-reach]] | Agent Reach, capability layer, internet access, multi-backend routing | 1 | 2026-07-03 | active |
@@ -52,11 +55,12 @@ Total topics: 37 | Total sources: 37 | Total concepts: 6
 | [[concepts/mcp-as-integration-layer]] | activepieces, agentscope, camel, owl, can1357, esengine, gptme, nanobot, langroid, microsoft_agent-framework, microsoft_autogen, hermes, opensandbox, panniantong, pydantic, ruflo, strands, pocketflow, cua, cowagent, aden-hive, google_adk | 2026-07-03 |
 | [[concepts/persistent-agent-memory]] | letta, cowagent, nanobot, genericagent, hermes, gptme, ruflo, aden-hive, evolver, openfang, planning-with-files | 2026-07-03 |
 | [[concepts/self-evolving-agents]] | evolver, cowagent, genericagent, hermes, aden-hive, ruflo, camel, oh-my-claudecode | 2026-07-03 |
-| [[concepts/claude-code-ecosystem-gravity]] | openclaude, edict, evolver, hermes, oh-my-claudecode, ruflo, openfang, planning-with-files, agent-reach, opencli | 2026-07-03 |
-| [[concepts/human-in-the-loop-as-production-primitive]] | activepieces, agentscope, camel, aden-hive, edict, gptme, langroid, microsoft_agent-framework, autogen, hermes, planning-with-files, pydantic, strands, evolver, google_adk | 2026-07-03 |
-| [[concepts/sandboxed-execution-as-infrastructure]] | e2b, opensandbox, cua, agentscope, ruflo, openfang, oh-my-pi | 2026-07-03 |
+| [[concepts/claude-code-ecosystem-gravity]] | openclaude, edict, evolver, hermes, oh-my-claudecode, ruflo, openfang, planning-with-files, agent-reach, opencli, flock, omnigent, agent-apprenticeship | 2026-07-04 |
+| [[concepts/human-in-the-loop-as-production-primitive]] | activepieces, agentscope, camel, aden-hive, edict, gptme, langroid, microsoft_agent-framework, autogen, hermes, planning-with-files, pydantic, strands, evolver, google_adk, flock, omnigent | 2026-07-04 |
+| [[concepts/sandboxed-execution-as-infrastructure]] | e2b, opensandbox, cua, agentscope, ruflo, openfang, oh-my-pi, omnigent | 2026-07-04 |
 
 ## Recent Changes
 
+- 2026-07-04: Incremental compile — 3 new topics added (duckbugio_flock, forsy-ai_agent-apprenticeship, omnigent-ai_omnigent). No new concepts, but 3 existing concepts updated with new instances: claude-code-ecosystem-gravity (10 → 13 topics, new "products built entirely on Claude Code" layer), human-in-the-loop-as-production-primitive (15 → 17 topics, new "pipeline-arbiter" layer), sandboxed-execution-as-infrastructure (7 → 8 topics).
 - 2026-07-03: Full recompile — 37 topics with `owner_repo` slug format (19 new frameworks added: aden-hive, browser-harness, camel, owl, oh-my-pi, edict, e2b, genericagent, microsoft_agent-framework, opensandbox, planning-with-files, agent-reach, pydantic-ai, openfang, ruflo, autogpt, harness-sdk, cua, waoowaoo, oh-my-claudecode — note: some overlap with renamed slugs). 6 concept articles written: 3 rebuilt from previous compile (mcp-as-integration-layer, persistent-agent-memory, self-evolving-agents) and 3 new (claude-code-ecosystem-gravity, human-in-the-loop-as-production-primitive, sandboxed-execution-as-infrastructure).
 - 2026-06-29: Initial compile — 18 topics created from GitHub sources (popular track), 4 concept articles discovered

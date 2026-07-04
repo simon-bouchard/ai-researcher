@@ -1,7 +1,7 @@
 ---
 concept: Sandboxed Execution as Infrastructure
-last_compiled: 2026-07-03
-topics_connected: [e2b-dev_e2b, opensandbox-group_opensandbox, trycua_cua, agentscope-ai_agentscope, ruvnet_ruflo, rightnow-ai_openfang, can1357_oh-my-pi]
+last_compiled: 2026-07-04
+topics_connected: [e2b-dev_e2b, opensandbox-group_opensandbox, trycua_cua, agentscope-ai_agentscope, ruvnet_ruflo, rightnow-ai_openfang, can1357_oh-my-pi, omnigent-ai_omnigent]
 status: active
 ---
 
@@ -22,6 +22,7 @@ The emergence of a dedicated sandbox infrastructure tier is significant: it indi
 - **2026-07-03** in [[../topics/ruvnet_ruflo]]: WASM local agent sandbox (rvagent) for agent isolation; separate from the cloud-hosted Anthropic Claude Managed Agents path — lightweight in-process sandboxing for agent code, complementing the heavier VM-based options
 - **2026-07-03** in [[../topics/rightnow-ai_openfang]]: WASM dual-metered sandbox with fuel metering + epoch interruption; watchdog thread kills runaway code — Rust-native sandboxing embedded in the agent OS architecture for tool execution safety
 - **2026-07-02** in [[../topics/can1357_oh-my-pi]]: Subagents work in isolated worktrees with schema-validated typed results — git worktree as lightweight isolation mechanism, a lower-cost alternative to VM-based sandboxes for code changes specifically
+- **2026-07-04** in [[../topics/omnigent-ai_omnigent]]: Meta-harness treats sandbox choice as a pluggable, per-session launch target — Modal, Daytona, Islo, E2B, CoreWeave, Kubernetes, OpenShell, Boxlite, or Databricks, selectable from the CLI or provisioned server-side as "managed hosts" — the widest single-product menu of sandbox backends in the tracked set, reinforcing that sandbox infra has become a commodity layer orchestration tools shop between rather than build themselves
 
 ## What This Means
 
@@ -35,6 +36,8 @@ The practical implications for agent builders: picking a sandbox is now a real i
 
 The bigger trend: as agents become capable enough to autonomously write and execute code, the sandbox infrastructure market will grow. The current "run AI-generated code safely" problem will expand to "give agents full computer-use capabilities safely" — which is the trajectory Cua is already on.
 
+Omnigent is a second-order confirmation of the trend: rather than building or picking one sandbox backend, it treats the entire sandbox layer as interchangeable plumbing behind a meta-harness, supporting nine different providers simultaneously. That a general-purpose orchestration tool can integrate this many backends with a uniform interface is only possible because the sandbox tier has standardized enough (create/run/destroy semantics) to be commoditized.
+
 ## Sources
 
 - [[../topics/e2b-dev_e2b]]
@@ -44,3 +47,4 @@ The bigger trend: as agents become capable enough to autonomously write and exec
 - [[../topics/ruvnet_ruflo]]
 - [[../topics/rightnow-ai_openfang]]
 - [[../topics/can1357_oh-my-pi]]
+- [[../topics/omnigent-ai_omnigent]]

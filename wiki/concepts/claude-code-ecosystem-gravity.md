@@ -1,7 +1,7 @@
 ---
 concept: Claude Code Ecosystem Gravity
-last_compiled: 2026-07-03
-topics_connected: [gitlawb_openclaude, cft0808_edict, evomap_evolver, nousresearch_hermes-agent, yeachan-heo_oh-my-claudecode, ruvnet_ruflo, rightnow-ai_openfang, othmanadi_planning-with-files, panniantong_agent-reach, jackwener_opencli]
+last_compiled: 2026-07-04
+topics_connected: [gitlawb_openclaude, cft0808_edict, evomap_evolver, nousresearch_hermes-agent, yeachan-heo_oh-my-claudecode, ruvnet_ruflo, rightnow-ai_openfang, othmanadi_planning-with-files, panniantong_agent-reach, jackwener_opencli, duckbugio_flock, omnigent-ai_omnigent, forsy-ai_agent-apprenticeship]
 status: active
 ---
 
@@ -9,12 +9,13 @@ status: active
 
 ## Pattern
 
-Claude Code and its precursor OpenClaw have become a gravitational center for the agent ecosystem — 10 of the 37 tracked frameworks are either forks of, harnesses around, skills for, or migration sources from this single tool. This is a non-obvious structural fact: a developer tool designed to assist one engineer at a time has generated a secondary ecosystem of frameworks that coordinate multiple agents, extend its capabilities, and adapt it for new audiences. The ecosystem is stratified into four layers, each representing a different kind of "gravity":
+Claude Code and its precursor OpenClaw have become a gravitational center for the agent ecosystem — 13 of the 40 tracked frameworks are either forks of, harnesses around, skills for, migration sources from, or wrappers around this single tool. This is a non-obvious structural fact: a developer tool designed to assist one engineer at a time has generated a secondary ecosystem of frameworks that coordinate multiple agents, extend its capabilities, and adapt it for new audiences. The ecosystem is stratified into five layers, each representing a different kind of "gravity":
 
 1. **Forks** (OpenClaude): take the Claude Code codebase and extend it with new features (multi-provider, headless gRPC, background sessions)
 2. **Harnesses** (Ruflo, oh-my-claudecode, Edict): sit above Claude Code and add orchestration, swarm coordination, team pipelines, or institutional review on top
 3. **Skills/extensions** (Planning with Files, Agent Reach, OpenCLI): install capabilities into Claude Code via the SKILL.md standard without replacing the agent itself
 4. **Migration paths** (Hermes, OpenFang): offer `hermes claw migrate` or an OpenClaw import engine, acknowledging that a significant user base has Claude Code/OpenClaw history to preserve
+5. **Single-purpose products built entirely on Claude Code** (Flock) and **meta-harnesses/learning layers that treat Claude Code as one first-class backend among several** (Omnigent, Agent Apprenticeship): a newer pattern where Claude Code is no longer just a codebase to fork or extend, but a stable enough runtime that whole products assume it as infrastructure
 
 ## Instances
 
@@ -28,6 +29,9 @@ Claude Code and its precursor OpenClaw have become a gravitational center for th
 - **2026-07-01** in [[../topics/othmanadi_planning-with-files]]: One of the most-starred Claude Code skills (24,197 stars); SKILL.md open standard that installs across 60+ agents; defines the file-based planning pattern now referenced across the ecosystem.
 - **2026-06-12** in [[../topics/panniantong_agent-reach]]: Capability layer installable in Claude Code, Cursor, OpenClaw, Windsurf, Codex, and any shell-capable agent; positions Claude Code as the primary target audience.
 - **2026-06-15** in [[../topics/jackwener_opencli]]: Skills installable into Claude Code, Cursor, and other skill-aware agents; skill format explicitly compatible with the Claude Code skill system.
+- **2026-07-02** in [[../topics/duckbugio_flock]]: Entire product is a chat-driven dev-team pipeline built on native Claude Code subagents (`core/agents/`); runs on a Claude Pro/Max subscription or Anthropic API key; has no non-Claude-Code execution path at all — the deepest dependency in the tracked set.
+- **2026-07-04** in [[../topics/omnigent-ai_omnigent]]: Meta-harness treating Claude Code as one of six first-class wrapped harnesses (`claude-sdk`/`claude-native` alongside Codex, Cursor, OpenCode, Hermes, Pi); example agent "Polly" specifically delegates coding sub-tasks to Claude Code among others and cross-vendor-reviews the diffs.
+- **2026-07-03** in [[../topics/forsy-ai_agent-apprenticeship]]: Lists Claude Code as one of seven auto-detected "Apprentice Agents" whose task executions become reusable Experience Compilations — treats Claude Code as a pluggable execution backend for learning-signal extraction rather than something to fork or extend.
 
 ## What This Means
 
@@ -37,7 +41,9 @@ The SKILL.md standard is particularly significant. Planning with Files (24k star
 
 The OpenClaw connection reveals a succession pattern: OpenClaw was the earlier community agent runtime; Hermes and OpenFang both offer explicit migration tooling *away* from it. This suggests OpenClaw is losing to Hermes/OpenFang as the default "community agent runtime" — but both new entrants chose to honor the migration rather than break it, because the OpenClaw user base was real.
 
-The structural risk: this gravity is real but fragile. If Anthropic changes the Claude Code architecture or licensing in ways that break the ecosystem (as has happened with other dev tools), the 10 frameworks that depend on it would be affected simultaneously.
+The structural risk: this gravity is real but fragile. If Anthropic changes the Claude Code architecture or licensing in ways that break the ecosystem (as has happened with other dev tools), the 13 frameworks that depend on it would be affected simultaneously.
+
+The newest layer (Flock, Omnigent, Agent Apprenticeship — all scraped 2026-07-02 to 2026-07-04) marks a maturity shift: earlier entrants either forked Claude Code or extended it in place; these three instead build *around* it as a stable dependency, no different in kind from depending on a cloud API. Flock goes furthest — it has no non-Claude-Code code path at all, betting the entire product on Claude Code's subscription model remaining available and priced as-is. Omnigent and Agent Apprenticeship hedge by treating Claude Code as one interchangeable backend among several, which is the more defensible position given the structural risk noted above.
 
 ## Sources
 
@@ -51,3 +57,6 @@ The structural risk: this gravity is real but fragile. If Anthropic changes the 
 - [[../topics/othmanadi_planning-with-files]]
 - [[../topics/panniantong_agent-reach]]
 - [[../topics/jackwener_opencli]]
+- [[../topics/duckbugio_flock]]
+- [[../topics/omnigent-ai_omnigent]]
+- [[../topics/forsy-ai_agent-apprenticeship]]

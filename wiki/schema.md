@@ -23,9 +23,11 @@ Each source file (`github-<owner>_<repo>.md`) maps 1:1 to one entity page for th
 | camel-ai_owl | OWL (Optimized Workforce Learning) | active |
 | can1357_oh-my-pi | Oh My Pi (omp) | active |
 | cft0808_edict | Edict (三省六部) | active |
+| duckbugio_flock | Flock | active |
 | e2b-dev_e2b | E2B | active |
 | esengine_deepseek-reasonix | DeepSeek-Reasonix | active |
 | evomap_evolver | Evolver | active |
+| forsy-ai_agent-apprenticeship | Agent Apprenticeship | active |
 | gitlawb_openclaude | OpenClaude | active |
 | google_adk-python | Agent Development Kit (ADK) | active |
 | gptme_gptme | gptme | active |
@@ -37,6 +39,7 @@ Each source file (`github-<owner>_<repo>.md`) maps 1:1 to one entity page for th
 | microsoft_agent-framework | Microsoft Agent Framework (MAF) | active |
 | microsoft_autogen | AutoGen | deprecated — succeeded by microsoft_agent-framework |
 | nousresearch_hermes-agent | Hermes Agent | active |
+| omnigent-ai_omnigent | Omnigent | active |
 | opensandbox-group_opensandbox | OpenSandbox | active |
 | othmanadi_planning-with-files | Planning with Files | active |
 | panniantong_agent-reach | Agent Reach | active |
@@ -61,9 +64,9 @@ Cross-cutting patterns that span 3+ topics. Interpretive, not just factual.
 | mcp-as-integration-layer | MCP has become the de facto interop protocol across 20+ frameworks — consumer and producer simultaneously |
 | persistent-agent-memory | 11 frameworks implement memory, but with fundamentally different architectures: recall vs. skill vs. distillation |
 | self-evolving-agents | Agents improving their own capabilities across 8 frameworks at different timescales and granularities |
-| claude-code-ecosystem-gravity | Claude Code / OpenClaw is a gravitational center: 10 frameworks are forks, harnesses, skills, or migration paths |
-| human-in-the-loop-as-production-primitive | HITL in 15 frameworks at 4 distinct architectural layers: tool, workflow, governance, harness |
-| sandboxed-execution-as-infrastructure | Dedicated sandbox infrastructure tier has emerged: E2B, OpenSandbox, Cua + 4 embedded sandbox implementations |
+| claude-code-ecosystem-gravity | Claude Code / OpenClaw is a gravitational center: 13 frameworks are forks, harnesses, skills, migration paths, or products built on it |
+| human-in-the-loop-as-production-primitive | HITL in 17 frameworks at 5 distinct architectural layers: tool, workflow, governance, harness, pipeline-arbiter |
+| sandboxed-execution-as-infrastructure | Dedicated sandbox infrastructure tier has emerged: E2B, OpenSandbox, Cua + 5 embedded/orchestrated sandbox implementations |
 
 ## Article Structure
 
@@ -100,3 +103,4 @@ Coverage tags: `[coverage: high — N sources]`, `[coverage: medium — N source
 
 - 2026-06-29: Initial schema generated from 18 topics, 4 concepts. First compile.
 - 2026-07-03: Full recompile with 37 topics (19 new). Topic slugs migrated to `owner_repo` format. 6 concepts updated/created: mcp-as-integration-layer (rebuilt, expanded from 11 to 22 topics), persistent-agent-memory (rebuilt, expanded to 11 topics), self-evolving-agents (rebuilt, expanded to 8 topics), claude-code-ecosystem-gravity (new), human-in-the-loop-as-production-primitive (new), sandboxed-execution-as-infrastructure (new). Previous 4 concepts (cli-coding-agent-convergence deleted — content folded into claude-code-ecosystem-gravity and self-evolving-agents which better capture the pattern).
+- 2026-07-04: Incremental compile, 3 new topics added: duckbugio_flock, forsy-ai_agent-apprenticeship, omnigent-ai_omnigent. All three connect to claude-code-ecosystem-gravity (10 → 13 topics); flock and omnigent-ai_omnigent also added to human-in-the-loop-as-production-primitive (15 → 17 topics, new "pipeline-arbiter" layer); omnigent-ai_omnigent also added to sandboxed-execution-as-infrastructure (7 → 8 topics).
