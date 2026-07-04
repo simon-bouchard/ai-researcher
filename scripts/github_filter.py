@@ -3,8 +3,9 @@
 Query GitHub's repository search API for AI agent frameworks (one query per
 topic, paginated to get all matching results), merge and dedupe across
 topics, then filter out repos that are already handled:
-  - repos in sources/github-<owner>_<repo>.md with an unchanged pushed_at
   - repos previously judged out-of-scope (recorded in scripts/github_rejected.json)
+  - repos in sources/github-<owner>_<repo>.md with an unchanged pushed_at
+  - repos in sources/ that were modified but scraped less than --reingest-after-days ago
 
 For each remaining candidate, fetches the first ~2 KB of the README so the
 LLM can make an accurate in/out-of-scope judgment without reading the full file.
@@ -17,11 +18,11 @@ Usage:
   github_filter.py --mode popular|emerging
 
   # Filter run with explicit parameters (for scripting/testing)
-  github_filter.py --min-stars N [--created-after-days N] [--limit N] [--topics t1,t2,...]
+  github_filter.py --min-stars N [--created-after-days N] [--reingest-after-days N] [--limit N] [--topics t1,t2,...]
 
 Mode presets:
-  popular:  --min-stars 3000 --limit 20
-  emerging: --min-stars 50 --created-after-days 30 --limit 20
+  popular:  --min-stars 10000 --reingest-after-days 60 --limit 20
+  emerging: --min-stars 500 --created-after-days 30 --limit 20
 """
 
 import argparse
@@ -59,25 +60,30 @@ def load_rejected():
 
 
 
-def existing_pushed_at(full_name):
+def existing_source_info(full_name):
+    """Return (pushed_at, scraped_at) from existing source file, or (None, None) if not found."""
     filename = "github-" + full_name.replace("/", "_") + ".md"
     path = os.path.join(SOURCES_DIR, filename)
     if not os.path.exists(path):
-        return None
+        return None, None
+    pushed_at = None
+    scraped_at = None
     with open(path, "r", encoding="utf-8") as f:
         in_frontmatter = False
         for line in f:
-            stripped = line.strip()
-            if stripped == "---":
+            if line.strip() == "---":
                 if not in_frontmatter:
                     in_frontmatter = True
                     continue
                 else:
                     break
-            match = re.match(r'^pushed_at:\s*"?([^"\n]+)"?\s*$', line)
-            if match:
-                return match.group(1).strip()
-    return None
+            m = re.match(r'^pushed_at:\s*"?([^"\n]+)"?\s*$', line)
+            if m:
+                pushed_at = m.group(1).strip()
+            m = re.match(r'^scraped_at:\s*"?([^"\n]+)"?\s*$', line)
+            if m:
+                scraped_at = m.group(1).strip()
+    return pushed_at, scraped_at
 
 
 def fetch_search(url):
@@ -142,13 +148,24 @@ def run_filter(args):
         for item in fetch_all(query):
             merged[item["full_name"]] = item
 
+    now = datetime.datetime.now(datetime.timezone.utc)
+
     candidates = []
     for full_name, item in merged.items():
         if full_name in rejected:
             continue
         current_pushed_at = item["pushed_at"][:10]
-        if existing_pushed_at(full_name) == current_pushed_at:
-            continue
+        existing_pushed, existing_scraped = existing_source_info(full_name)
+        if existing_pushed is not None:
+            if existing_pushed == current_pushed_at:
+                continue  # unchanged
+            if args.reingest_after_days is not None and existing_scraped:
+                try:
+                    scraped_dt = datetime.datetime.fromisoformat(existing_scraped.replace("Z", "+00:00"))
+                    if (now - scraped_dt).days < args.reingest_after_days:
+                        continue  # modified but scraped too recently
+                except ValueError:
+                    pass  # malformed scraped_at — let it through
         candidates.append({
             "full_name": full_name,
             "html_url": item["html_url"],
@@ -182,14 +199,16 @@ def run_filter(args):
 def main():
     parser = argparse.ArgumentParser()
     MODE_PRESETS = {
-        "popular":  {"min_stars": 10000, "created_after_days": None, "limit": 20},
-        "emerging": {"min_stars": 500,   "created_after_days": 30,   "limit": 20},
+        "popular":  {"min_stars": 10000, "created_after_days": None, "reingest_after_days": 60, "limit": 20},
+        "emerging": {"min_stars": 500,   "created_after_days": 30,  "reingest_after_days": None, "limit": 20},
     }
 
     parser.add_argument("--mode", choices=MODE_PRESETS.keys(),
                         help="preset configuration (for use in Hermes prompts)")
     parser.add_argument("--min-stars", type=int)
     parser.add_argument("--created-after-days", type=int, default=None)
+    parser.add_argument("--reingest-after-days", type=int, default=None,
+                        help="skip already-ingested repos modified less than N days ago")
     parser.add_argument("--limit", type=int, default=None,
                         help="max candidates to return per run (for batched ingestion)")
     parser.add_argument("--topics", default=",".join(DEFAULT_TOPICS))
@@ -201,6 +220,8 @@ def main():
             args.min_stars = args.min_stars or preset["min_stars"]
             if args.created_after_days is None:
                 args.created_after_days = preset["created_after_days"]
+            if args.reingest_after_days is None:
+                args.reingest_after_days = preset["reingest_after_days"]
             if args.limit is None:
                 args.limit = preset["limit"]
         run_filter(args)
