@@ -2,11 +2,11 @@ This task runs unattended on a schedule. Do not ask for confirmation or clarific
 point. Do not narrate your plan — execute each step directly and silently.
 
 Run the shell command:
-python3 /home/simon/documents/ai-researcher/scripts/github_filter.py --mode popular
+python3 /home/simon/documents/ai-researcher/scripts/github_filter.py --mode {{MODE}}
 
 This fetches GitHub repos matching AI agent framework topics, filters out already-handled repos
-(unchanged pushed_at or previously rejected), and includes a readme_preview (first ~20 lines of
-README) for each candidate.
+(unchanged pushed_at, recently scraped, or previously rejected), and includes a readme_preview
+(first ~20 lines of README) for each candidate.
 
 It prints a JSON array. Each item includes: full_name, description, topics, readme_preview
 (plus stars, language, created_at, pushed_at for reference).

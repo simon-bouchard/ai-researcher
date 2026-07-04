@@ -8,11 +8,6 @@ PYTHON = f"{PROJECT_ROOT}/.venv/bin/python3"
 CLAUDE = "/home/simon/.local/bin/claude"
 LOCAL_BIN = "/home/simon/.local/bin"
 
-PROMPTS = {
-    "popular": f"{PROJECT_ROOT}/prompts/github_frameworks_popular.md",
-    "emerging": f"{PROJECT_ROOT}/prompts/github_frameworks_emerging.md",
-}
-
 SCHEDULES = {
     "popular": "@weekly",
     "emerging": "@daily",
@@ -29,7 +24,7 @@ def make_dag(mode: str) -> DAG:
     ) as dag:
         ingest = BashOperator(
             task_id="ingest",
-            bash_command=f"{PROJECT_ROOT}/scripts/ingest_all.sh {PROMPTS[mode]}",
+            bash_command=f"{PROJECT_ROOT}/scripts/ingest_all.sh {mode}",
             cwd=PROJECT_ROOT,
             env={"PATH": f"{LOCAL_BIN}:/usr/local/bin:/usr/bin:/bin"},
             append_env=True,
