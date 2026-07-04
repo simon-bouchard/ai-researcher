@@ -74,13 +74,15 @@ WikiLLM's job, downstream.
   by Hermes; abstract stored verbatim — see `prompts/arxiv_research.md`)
 - Possible future additions: Semantic Scholar, key practitioner blogs, HuggingFace papers
 
-**Framework discovery track** (in design):
+**Framework discovery track** (implemented and running):
 - GitHub Search API, two cadences:
   - Weekly: established/popular frameworks (sorted by stars) — with change-detection
     (compare `pushed_at` against the last scrape) to avoid re-fetching unchanged READMEs
   - Daily: newly created/updated repos with traction — catches emerging frameworks
 - Full README stored verbatim (unlike arXiv abstracts, READMEs are short enough in aggregate
   that no summarization is needed even for storage)
+- Star thresholds currently conservative for testing (popular: 10k, emerging: 500); target
+  production values are popular ~1000, emerging 50–100
 - Possible future additions: HuggingFace new repositories, Hacker News (Show HN), Twitter/X
 
 There will naturally be overlap between the two tracks (a new framework often has an
@@ -101,9 +103,9 @@ It ingests `/sources` and builds a structured, interlinked wiki:
   and cross-reference rules. This is the key reason for choosing this implementation over
   standalone CLI tools, which have hardcoded extraction prompts with no override mechanism.
 - Hash-based incremental compilation — only recompiles topics whose source files changed
-- Automated via `claude -p "/wiki-compile"` in cron once `.wiki-compiler.json` and `schema.md`
-  are committed to the repo (one-time interactive `/wiki-init` required to bootstrap config)
-- Query interface via `/wiki-query` slash command
+- Automated via `claude -p "/llm-wiki-compiler:wiki-compile"` as the final Airflow task
+- Query interface via `/llm-wiki-compiler:wiki-query` slash command
+- Topic slugs use `owner_repo` format (lowercased) to guarantee uniqueness across repos with identical names
 
 ### 3. Query Agent
 
@@ -132,10 +134,12 @@ At the end of this project:
 ## Open Questions
 
 - ~~Which WikiLLM implementation to use~~ — resolved: `ussumant/llm-wiki-compiler` (Claude Code plugin with customizable `schema.md`; chosen over standalone CLI tools for extraction control)
-- Framework discovery track: exact GitHub search query (topics + free-text), star thresholds
-  for the "emerging" query, and the change-detection check (compare `pushed_at`)
+- ~~Framework discovery track: exact GitHub search query, star thresholds, change-detection~~
+  — resolved: 6 topics queried, `pushed_at` change-detection implemented, thresholds currently
+  conservative (popular 10k, emerging 500) pending tuning toward production targets (~1000 / 50–100)
 - Whether/when to revisit ingestion depth (e.g. full PDF text for papers) if the query agent's
   use cases demand more than abstract/README-level awareness
-- Gateway/cron automation so jobs run unattended (`hermes gateway install`)
+- ~~Gateway/cron automation~~ — resolved: Airflow (standalone) orchestrates both tracks locally;
+  `hermes gateway` not needed
 - Whether a thin query-agent wrapper around `llmwiki context`/MCP is needed, or direct use
   suffices

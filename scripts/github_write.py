@@ -81,12 +81,14 @@ def write_source(meta, readme):
 
     topics_yaml = json.dumps(meta["topics"])
     scraped_at = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    # sanitize description to avoid backslashes in f-string expressions
+    safe_description = (meta.get("description") or "").replace('"', '\\"')
 
     content = f"""---
 name: "{repo}"
 repo: "{meta['full_name']}"
 url: "{meta['html_url']}"
-description: "{(meta['description'] or '').replace('"', '\\"')}"
+description: "{safe_description}"
 stars: {meta['stargazers_count']}
 language: "{meta['language'] or ''}"
 topics: {topics_yaml}

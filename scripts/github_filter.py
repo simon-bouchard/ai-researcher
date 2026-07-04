@@ -182,8 +182,8 @@ def run_filter(args):
 def main():
     parser = argparse.ArgumentParser()
     MODE_PRESETS = {
-        "popular":  {"min_stars": 3000, "created_after_days": None, "limit": 20},
-        "emerging": {"min_stars": 50,   "created_after_days": 30,   "limit": 20},
+        "popular":  {"min_stars": 10000, "created_after_days": None, "limit": 20},
+        "emerging": {"min_stars": 500,   "created_after_days": 30,   "limit": 20},
     }
 
     parser.add_argument("--mode", choices=MODE_PRESETS.keys(),

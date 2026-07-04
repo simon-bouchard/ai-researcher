@@ -2,7 +2,7 @@
 # Bootstrap: runs the popular GitHub frameworks prompt in batches until all
 # candidates have been processed (ingested or rejected).
 #
-# Each hermes run handles --limit 20 candidates. This script loops until a
+# Each hermes chat run handles --limit 20 candidates. This script loops until a
 # full run produces no new source files and no new rejections, which means
 # the filter returned an empty list.
 #
@@ -25,7 +25,7 @@ while true; do
   before_files=$(ls "$SOURCES"/github-*.md 2>/dev/null | wc -l)
   before_rejected=$(rejected_count)
 
-  hermes run "$PROMPT"
+  hermes chat --cli -Q --yolo -q "$(cat "$PROMPT")"
 
   after_files=$(ls "$SOURCES"/github-*.md 2>/dev/null | wc -l)
   after_rejected=$(rejected_count)

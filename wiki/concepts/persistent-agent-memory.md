@@ -1,7 +1,7 @@
 ---
 concept: Persistent Agent Memory
-last_compiled: 2026-06-29
-topics_connected: [letta, cowagent, genericagent, nanobot, hermes-agent]
+last_compiled: 2026-07-03
+topics_connected: [letta-ai_letta, zhayujie_cowagent, hkuds_nanobot, lsdefine_genericagent, nousresearch_hermes-agent, gptme_gptme, ruvnet_ruflo, aden-hive_hive, evomap_evolver, rightnow-ai_openfang, othmanadi_planning-with-files]
 status: active
 ---
 
@@ -9,27 +9,48 @@ status: active
 
 ## Pattern
 
-Five frameworks in this tracker have built persistent memory as a core architectural primitive — not a plugin or afterthought, but the central design concern. Each has named it differently (MemGPT memory blocks, Dream memory, L0–L4 memory layers, FTS5 cross-session memory) and solved it differently, but all share the same root insight: stateless execution loops are insufficient for agents operating over long time horizons.
+Persistent memory — the ability of an agent to recall information across sessions and build on past work — is implemented across 11+ tracked frameworks, but what's striking is the diversity of approaches. There is no consensus on *what* memory is or *how* it should persist: the same goal is served by structured key-value blocks (Letta), nightly dream distillation (CowAgent, nanobot), skill crystallization from task trajectories (GenericAgent, Hermes), git-tracked workspaces (gptme), HNSW vector databases (Ruflo), Gene/Capsule evolution stores (Evolver), file-based planning state (Planning with Files), role-scoped graph memory (Hive), and SQLite + vector hybrids (OpenFang).
 
-The approaches diverge sharply at the memory model level. Letta (the MemGPT successor) treats memory as addressable blocks that the agent can self-edit. GenericAgent uses a 5-tier hierarchy from volatile working memory to crystallized skill. Hermes-agent combines FTS5 full-text search with a Honcho user modeling layer. CowAgent adds a "Deep Dream" distillation pass that compresses episodic memories into long-term abstractions. Nanobot brands it "Dream memory" with a `/goal` mode for sustained objectives. Despite different architectures, all five are solving the same fundamental problem: how does an agent know what it has already done, learned, and decided?
+The split isn't arbitrary — it reflects different theories of what an agent needs to remember. Letta frames memory as *structured state* (human context, persona): static facts injected into every session. CowAgent and nanobot frame it as *compressed experience*: raw conversation is too noisy, so a nightly process distills it into lasting memory entries. GenericAgent and Hermes frame it as *skill crystallization*: the execution path of a solved task is the memory worth keeping. Gptme frames it as *version-controlled workspace*: files are memory, git is the history. Planning with Files frames it as *task-execution continuity*: not memory in the rich sense, but enough state to survive a context wipe and resume work.
 
 ## Instances
 
-- **2024** in [[../topics/letta]]: MemGPT introduced self-editing memory blocks as the core primitive; Letta is its production successor with a full Agents API and hosted cloud option
-- **2026-02** in [[../topics/cowagent]]: CowAgent v2.0 rebranded from chatgpt-on-wechat and added a three-tier memory system with "Deep Dream" distillation loop — persistent memory became the product's main identity
-- **2026-01** in [[../topics/genericagent]]: GenericAgent launched with a 5-layer memory system (L0 volatile → L4 crystallized Skill) as the primary differentiator in its arXiv paper
-- **2025-11** in [[../topics/nanobot]]: Nanobot shipped "Dream memory" and `/goal` sustained-objective mode as founding features, not v2 additions
-- **2025-07** in [[../topics/hermes-agent]]: Hermes-agent added FTS5 cross-session memory and Honcho user modeling as part of its "closed learning loop" architecture
+- **2026-07-01** in [[../topics/letta-ai_letta]]: Memory blocks (`human`, `persona`, custom labels) as structured persistent state injected at runtime — memory as typed, server-managed schema rather than raw conversation history
+- **2026-07-03** in [[../topics/zhayujie_cowagent]]: Three-tier memory (short-term → daily → MEMORY.md) with nightly Deep Dream distillation pass — memory as compressed, curated experience across timescales
+- **2026-07-03** in [[../topics/hkuds_nanobot]]: Two-stage Dream memory with token-based management and auto-compact on idle — similar distillation pattern to CowAgent but with explicit token pressure as the trigger
+- **2026-07-03** in [[../topics/lsdefine_genericagent]]: 5-layer memory (L0 Meta Rules → L4 Session Archive) with automated skill crystallization at L3 — task execution paths promoted to reusable SOPs
+- **2026-07-03** in [[../topics/nousresearch_hermes-agent]]: Closed learning loop with FTS5 session search + LLM summarization for cross-session recall; skills created from complex tasks and improved during use; Honcho dialectic user modeling for personal profiling
+- **2026-06-16** in [[../topics/gptme_gptme]]: Git-tracked workspace ("brain") as memory substrate — files are persistent state, commits are history, no separate memory database required
+- **2026-07-03** in [[../topics/ruvnet_ruflo]]: AgentDB with HNSW indexing; SONA neural patterns route similar future tasks using learned trajectories; benchmarked 1.9x faster at N=20k vs brute force — vector memory as performance infrastructure
+- **2026-07-01** in [[../topics/aden-hive_hive]]: Role-based memory scoped per agent role and evolving with project context across runs — memory partitioned by team structure rather than by topic or time
+- **2026-06-16** in [[../topics/evomap_evolver]]: Gene/Capsule store in `<workspace>/.evolver/gep/` with EvolutionEvent audit trail — memory framed as an evolution asset rather than a recall database; backed by arXiv:2604.15097 showing Gene representation outperforms Skill docs
+- **2026-07-02** in [[../topics/rightnow-ai_openfang]]: SQLite persistence + vector embeddings with canonical sessions and compaction — memory as standard database infrastructure rather than agent-specific abstraction
+- **2026-07-01** in [[../topics/othmanadi_planning-with-files]]: `task_plan.md`, `findings.md`, `progress.md` on disk as execution-state memory; hook-driven re-injection before major decisions — memory as crash-proof planning continuity rather than knowledge recall
 
 ## What This Means
 
-Persistent memory is the next frontier of differentiation in agent frameworks after tool-calling and multi-agent coordination. The frameworks that have committed to it earliest (Letta, Hermes) have built the most architecturally distinctive products. The ones adding it as a feature later risk being outcompeted on depth.
+There is no single right answer for agent memory, and the tracked frameworks are discovering this experimentally. The implementations cluster around two fundamentally different purposes:
 
-The open question is which memory model wins. Self-editing blocks (Letta) give the agent fine control but require careful engineering to avoid hallucinated edits. Distillation loops (CowAgent, GenericAgent) are more opaque but may produce better compression. FTS5 search (Hermes) is principled and inspectable. Watching which approach survives production use cases is the key signal to track.
+**Recall memory**: remembering facts, user preferences, and context across sessions (Letta blocks, gptme workspace, Hermes user modeling, OpenFang SQLite). These implementations answer "what does the agent know?" and are more like databases.
+
+**Skill memory**: crystallizing successful execution patterns so they're reusable (GenericAgent L3, Hermes skills, Ruflo SONA routing, Evolver Gene/Capsules). These answer "how does the agent get better at tasks?" and are more like performance optimization.
+
+**Distillation memory**: CowAgent and nanobot occupy a middle ground — they accumulate conversation history but run background processes to compress it into dense, durable entries. This mirrors how human memory consolidates during sleep.
+
+The practical implication for anyone building agents: recall memory and skill memory require very different architectures. Conflating them (building one system that tries to do both) is probably why some agent "memory" features underperform — they optimize for the wrong kind of persistence.
+
+The meta-insight: every framework above a certain capability threshold eventually adds some form of persistence. Memory is not optional for agents that operate across multiple sessions — it's the mechanism that turns a stateless chatbot into an agent with a history.
 
 ## Sources
-- [[../topics/letta]]
-- [[../topics/cowagent]]
-- [[../topics/genericagent]]
-- [[../topics/nanobot]]
-- [[../topics/hermes-agent]]
+
+- [[../topics/letta-ai_letta]]
+- [[../topics/zhayujie_cowagent]]
+- [[../topics/hkuds_nanobot]]
+- [[../topics/lsdefine_genericagent]]
+- [[../topics/nousresearch_hermes-agent]]
+- [[../topics/gptme_gptme]]
+- [[../topics/ruvnet_ruflo]]
+- [[../topics/aden-hive_hive]]
+- [[../topics/evomap_evolver]]
+- [[../topics/rightnow-ai_openfang]]
+- [[../topics/othmanadi_planning-with-files]]

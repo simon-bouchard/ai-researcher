@@ -10,33 +10,60 @@ This file defines the structure and conventions for this knowledge base wiki. It
 
 Each source file (`github-<owner>_<repo>.md`) maps 1:1 to one entity page for that framework. No sub-feature pages for things mentioned in only one repo.
 
-- `activepieces`: Open-source workflow automation platform (Zapier alternative) with MCP-native integration; every piece auto-publishes as an MCP server
-- `agent-reach`: Capability layer (not a framework) that extends Claude Code and other AI agents with browser, computer, and web tool access across 12+ platforms
-- `agentscope`: Alibaba-backed production-grade Python agent framework with async streaming, middleware system, and FastAPI multi-tenant service; v2.0 May 2026
-- `areal`: RL training infrastructure for LLM reasoning/agentic models at scale (Tsinghua IIIS + Ant Group); produces agents rather than operating them
-- `autogen`: Microsoft Research multi-agent framework (maintenance mode as of 2026); official successor is Microsoft Agent Framework (MAF)
-- `cowagent`: High-traction Python agent harness (formerly chatgpt-on-wechat) with three-tier memory, Deep Dream distillation, self-evolution loop, and 12-channel support
-- `deepseek-reasonix`: DeepSeek-native terminal coding agent (Go rewrite at v1.0); differentiates on prefix-cache stability and zero-dependency static binary
-- `evolver`: GEP-powered prompt-evolution engine for AI agents; evolves only prompts (not code), ships hooks for 6 runtimes; source-available license transition in progress
-- `genericagent`: Minimal self-evolving agent with 5-layer memory (L0-L4), real-browser control via TMWebdriver, and skill crystallization from task experience
-- `gptme`: Local-first provider-agnostic terminal agent CLI (launched Spring 2023); 17 tool categories, MCP auto-discovery, ACP IDE integration, autonomous Bob agent
-- `harness-sdk`: Strands Agents Python+TypeScript SDK with WASM bridge for cross-language interop; Amazon Bedrock default, interceptable agent loop with tracing/guardrails
-- `hermes-agent`: High-traction (194k stars) terminal agent with closed learning loop: FTS5 memory, autonomous skill creation, Honcho user modeling, 6 terminal backends
-- `langroid`: CMU/UW-Madison research-origin Python framework built on Actor-model multi-agent programming; strong RAG/DocChatAgent and SQL/database agent support
-- `letta`: MemGPT successor focused on persistent stateful agents; memory-block abstraction with self-editing, Agents API, hosted + self-hosted options
-- `nanobot`: High-traction (44k stars) personal coding + automation agent with Dream memory, `/goal` sustained-objective mode, 15+ chat channels, multi-provider routing
-- `openclaude`: Community fork of Claude Code with 13+ provider backends, headless gRPC mode, named sub-agent routing for cost optimization
-- `opencli`: Browser-automation CLI with 100+ site adapters; exposes Chrome DevTools Protocol as CLI subcommands for AI agents using the user's real logged-in Chrome profile
-- `pocketflow`: Minimalist 100-line LLM framework using graph as core primitive; multi-language ports, 30+ cookbook examples, MCP and A2A protocol support
+### Active Topics
+
+| Slug | Framework Name | Status |
+|------|---------------|--------|
+| activepieces_activepieces | Activepieces | active |
+| aden-hive_hive | Hive (OpenHive) | active |
+| agentscope-ai_agentscope | AgentScope | active |
+| areal-project_areal | AReaL | active |
+| browser-use_browser-harness | Browser Harness | active |
+| camel-ai_camel | CAMEL | active |
+| camel-ai_owl | OWL (Optimized Workforce Learning) | active |
+| can1357_oh-my-pi | Oh My Pi (omp) | active |
+| cft0808_edict | Edict (三省六部) | active |
+| e2b-dev_e2b | E2B | active |
+| esengine_deepseek-reasonix | DeepSeek-Reasonix | active |
+| evomap_evolver | Evolver | active |
+| gitlawb_openclaude | OpenClaude | active |
+| google_adk-python | Agent Development Kit (ADK) | active |
+| gptme_gptme | gptme | active |
+| hkuds_nanobot | nanobot | active |
+| jackwener_opencli | OpenCLI | active |
+| langroid_langroid | Langroid | active |
+| letta-ai_letta | Letta (formerly MemGPT) | active |
+| lsdefine_genericagent | GenericAgent | active |
+| microsoft_agent-framework | Microsoft Agent Framework (MAF) | active |
+| microsoft_autogen | AutoGen | deprecated — succeeded by microsoft_agent-framework |
+| nousresearch_hermes-agent | Hermes Agent | active |
+| opensandbox-group_opensandbox | OpenSandbox | active |
+| othmanadi_planning-with-files | Planning with Files | active |
+| panniantong_agent-reach | Agent Reach | active |
+| pydantic_pydantic-ai | Pydantic AI | active |
+| rightnow-ai_openfang | OpenFang | active |
+| ruvnet_ruflo | Ruflo | active |
+| significant-gravitas_autogpt | AutoGPT | active |
+| strands-agents_harness-sdk | Strands Agents | active |
+| the-pocket_pocketflow | PocketFlow | active |
+| transformeroptimus_superagi | SuperAGI | low-activity — last push 2025-01-22 |
+| trycua_cua | Cua | active |
+| waooai_waoowaoo | waoowaoo AI Film Studio | active |
+| yeachan-heo_oh-my-claudecode | oh-my-claudecode | active |
+| zhayujie_cowagent | CowAgent | active |
 
 ## Concepts
 
 Cross-cutting patterns that span 3+ topics. Interpretive, not just factual.
 
-- `mcp-as-integration-layer`: MCP (Model Context Protocol) has become the de facto interoperability standard across 11+ frameworks independently — not by mandate but by network effects — connects [activepieces, gptme, autogen, langroid, cowagent, pocketflow, harness-sdk, deepseek-reasonix, openclaude, agentscope, nanobot]
-- `persistent-agent-memory`: Five frameworks treat agent memory as a core architectural primitive with distinct models (self-editing blocks, distillation loops, FTS5 search, tiered layers) — connects [letta, cowagent, genericagent, nanobot, hermes-agent]
-- `self-evolving-agents`: Four frameworks build explicit self-improvement loops where agents write, validate, and reuse skills from their own execution experience — connects [evolver, cowagent, genericagent, hermes-agent]
-- `cli-coding-agent-convergence`: Four terminal coding agents (all responding to Claude Code/Codex CLI) competing on second-order differentiation: memory, cache optimization, longevity, and provider routing — connects [hermes-agent, gptme, openclaude, deepseek-reasonix]
+| Slug | Description |
+|------|-------------|
+| mcp-as-integration-layer | MCP has become the de facto interop protocol across 20+ frameworks — consumer and producer simultaneously |
+| persistent-agent-memory | 11 frameworks implement memory, but with fundamentally different architectures: recall vs. skill vs. distillation |
+| self-evolving-agents | Agents improving their own capabilities across 8 frameworks at different timescales and granularities |
+| claude-code-ecosystem-gravity | Claude Code / OpenClaw is a gravitational center: 10 frameworks are forks, harnesses, skills, or migration paths |
+| human-in-the-loop-as-production-primitive | HITL in 15 frameworks at 4 distinct architectural layers: tool, workflow, governance, harness |
+| sandboxed-execution-as-infrastructure | Dedicated sandbox infrastructure tier has emerged: E2B, OpenSandbox, Cua + 4 embedded sandbox implementations |
 
 ## Article Structure
 
@@ -55,7 +82,7 @@ Coverage tags: `[coverage: high — N sources]`, `[coverage: medium — N source
 
 ## Naming Conventions
 
-- Topic slugs: lowercase-kebab-case matching the repo name from `topic_hints` (e.g., `hermes-agent`, `pocketflow`)
+- Topic slugs: `owner_repo` format, lowercased, matching the source filename without the `github-` prefix and `.md` extension (e.g., `nousresearch_hermes-agent`, `the-pocket_pocketflow`) — guarantees uniqueness across repos with identical names
 - Source files: `github-<owner>_<repo>.md` in `sources/` — one file per repo, re-scraping overwrites (built-in dedup)
 - Topic files: `{slug}.md` in `wiki/topics/`
 - Concept files: `{concept-slug}.md` in `wiki/concepts/`
@@ -72,3 +99,4 @@ Coverage tags: `[coverage: high — N sources]`, `[coverage: medium — N source
 ## Evolution Log
 
 - 2026-06-29: Initial schema generated from 18 topics, 4 concepts. First compile.
+- 2026-07-03: Full recompile with 37 topics (19 new). Topic slugs migrated to `owner_repo` format. 6 concepts updated/created: mcp-as-integration-layer (rebuilt, expanded from 11 to 22 topics), persistent-agent-memory (rebuilt, expanded to 11 topics), self-evolving-agents (rebuilt, expanded to 8 topics), claude-code-ecosystem-gravity (new), human-in-the-loop-as-production-primitive (new), sandboxed-execution-as-infrastructure (new). Previous 4 concepts (cli-coding-agent-convergence deleted — content folded into claude-code-ecosystem-gravity and self-evolving-agents which better capture the pattern).
